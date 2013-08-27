@@ -1,5 +1,6 @@
 package com.fls.main.screen;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import com.fls.main.art.Sprites;
@@ -73,7 +74,7 @@ public class MessageScreen extends Screen {
         this.parent = screen;
         this.id = id;
         delay = 30;
-        Art.setTextCol(0xFFFFFF);
+        Art.setTextCol(Color.white);
     }
 
     public void render(Graphics g) {

@@ -1,13 +1,17 @@
 package com.fls.main;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import javax.swing.JFrame;
+import javax.swing.UIManager;
 
+import com.fls.main.art.Sprites;
 import com.fls.main.screen.Screen;
 import com.fls.main.screen.TitleScreen;
 
 import fls.engine.main.Init;
+import fls.engine.main.art.Art;
 import fls.engine.main.input.Input;
 
 @SuppressWarnings("serial")
@@ -18,6 +22,9 @@ public class Ninja extends Init {
     public JFrame frame;
 
     public Ninja() {
+        Sprites.reload("");
+        Art.setTextCol(Color.white);
+        laf();
         showFPS();
         setScale(1);
         createWindow("Ninja Game", 500, 360);
@@ -25,6 +32,14 @@ public class Ninja extends Init {
         setScreen(new TitleScreen());
         setCreators("Elliot Lee-Cerrino");
 
+    }
+
+    private void laf() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void tick() {

@@ -28,7 +28,7 @@ public class DebugScreen extends Screen {
         int y = 50;
         g.setColor(Color.black);
         g.fillRect(0, 0, x, y);
-        Art.setTextCol(0xffffff);
+        Art.setTextCol(Color.white);
         Art.drawString("X:" + (int) parent.player.x, g, 0, 0);
         Art.drawString("Y:" + (int) parent.player.y, g, 0, 8);
         Art.drawString("onGround:" + parent.player.onGround, g, 0, 16);

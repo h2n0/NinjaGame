@@ -1,5 +1,6 @@
 package com.fls.main.screen;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import com.fls.main.core.Level;
@@ -47,7 +48,7 @@ public class GameScreen extends Screen {
         if (mayRespawn && input.enter.isPressed()) {
             respawnRoom();
             mayRespawn = false;
-            Art.setTextCol(0xffffff);
+            Art.setTextCol(Color.white);
         }
 
     }
@@ -55,7 +56,7 @@ public class GameScreen extends Screen {
     public void render(Graphics g) {
         level.render(g);
         if (mayRespawn) {
-            Art.setTextCol(0x000000);
+            Art.setTextCol(Color.black);
             Art.drawScaledText("Dead", g, 100, 100, 4);
             Art.drawScaledText("Press ENTER to respawn", g, 100, 130, 2);
         }

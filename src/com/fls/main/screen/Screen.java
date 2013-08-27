@@ -26,4 +26,12 @@ public abstract class Screen {
     public void setScreen(Screen screen) {
         ninja.setScreen(screen);
     }
+
+    protected void flush() {
+        entitys.clear();
+    }
+
+    public void add(Entity e) {
+        entitys.add(e);
+    }
 }

@@ -3,7 +3,6 @@ package com.fls.main.screen;
 import java.awt.Graphics;
 
 import com.fls.main.art.Sprites;
-import com.fls.main.entitys.Entity;
 import com.fls.main.entitys.gui.Button;
 import com.fls.main.sound.Audio;
 
@@ -12,7 +11,7 @@ import fls.engine.main.art.Art;
 import fls.engine.main.input.Input;
 
 public class TitleScreen extends Screen {
-    private int buttonX = 235, buttonY = 175;
+    private int buttonX = 220, buttonY = 175;
 
     public void render(Graphics g) {
         g.drawImage(Sprites.bgMenu, 0, 0, null);
@@ -25,9 +24,9 @@ public class TitleScreen extends Screen {
 
     public void tick(Input input) {
         if (this.entitys.isEmpty()) {
-            add(new Button("Play", buttonX, buttonY));
-            add(new Button("Level mkr!", buttonX, buttonY + 32));
-            add(new Button("Exit", buttonX, buttonY + (32 * 2)));
+            add(new Button("Play", buttonX + 10, buttonY, 2, 13));
+            add(new Button("Level mkr!", buttonX - 22, buttonY + 38, 5, 14));
+            add(new Button("Exit", buttonX + 10, buttonY + (38 * 2), 2, 13));
         }
         for (int i = 0; i < this.entitys.size(); i++) {
             Button e = (Button) entitys.get(i);
@@ -52,13 +51,5 @@ public class TitleScreen extends Screen {
             ninja.stop();
             break;
         }
-    }
-
-    public void add(Entity e) {
-        entitys.add(e);
-    }
-
-    public void flush() {
-        entitys.clear();
     }
 }

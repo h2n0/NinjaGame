@@ -1,6 +1,7 @@
 package com.fls.main.core;
 
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -12,6 +13,7 @@ import com.fls.main.entitys.Explosion;
 import com.fls.main.entitys.PickUp;
 import com.fls.main.entitys.Sign;
 import com.fls.main.screen.GameScreen;
+import com.fls.main.screen.TestLevelScreen;
 
 public class Level {
 
@@ -25,11 +27,55 @@ public class Level {
     public static final double friction = 0.99;
     public Random random = new Random();
     private GameScreen screen;
-    private String path = "/Level.png";
+    private TestLevelScreen s2;
 
-    public Level(GameScreen screen, String path, int w, int h, int xOff, int yOff, int xSpawn, int ySpawn) {
-        this.path = path;
-        new Level(screen, w, h, xOff, yOff, xSpawn, ySpawn);
+    @SuppressWarnings("unchecked")
+    public Level(TestLevelScreen s, BufferedImage i) {
+        this.s2 = s;
+        this.width = 25;
+        this.height = 18;
+        int[] pixels = new int[width * height];
+
+        i.getRGB(0, 0, width, height, pixels, 0, width);
+
+        tiles = new byte[width * height];
+        entityMap = new ArrayList[width * height];
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                entityMap[x + y * width] = new ArrayList<Entity>();
+                int col = pixels[x + y * width] & 0xffffff;
+                byte ww = 0;
+
+                if (col == 0xFFFFFF) {
+                    ww = 1;
+                } else if (col == 0xAD6D00) {
+                    ww = 2;
+                } else if (col == 0xFFFF00) {
+                    this.xSpawn = x * 20;
+                    this.ySpawn = y * 20;
+                } else if (col == 0xFF00FF) { // --> Convayor
+                    ww = 3;
+                } else if (col == 0x9E009E) { // <-- Convayor
+                    ww = 4;
+                } else if (col == 0xBB00BB) { // ^ Convayor
+                    ww = 5;
+                } else if (col == 0x007700) { // Ladder
+                    ww = 6;
+                } else if (col == 0x00FF00) { // Spikes
+                    ww = 7;
+                } else if ((col & 0x00ffff) == 0x00ff00 && (col & 0xff0000) > 0) { // Sign
+                    addEntity(new Sign(x * 20, y * 20, (col >> 16) & 0xff));
+                } else if (col == 0x00FFFF) { // PickUp
+                    addEntity(new PickUp(x * 20, y * 20, random.nextInt(2)));
+                } else if (col == 0xFF0000) {
+                    ww = 8;
+                } else if (col == 0xFFAA00) {
+                    ww = 9;
+                }
+                tiles[x + y * width] = ww;
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -39,7 +85,7 @@ public class Level {
         this.height = h;
         int[] pixels = new int[25 * 18];
 
-        Sprites.load(path).getRGB(xOff * 25, yOff * 18, 25, 18, pixels, 0, 25);
+        Sprites.level.getRGB(xOff * 25, yOff * 18, 25, 18, pixels, 0, 25);
 
         tiles = new byte[w * h];
         entityMap = new ArrayList[w * h];
@@ -251,7 +297,7 @@ public class Level {
     }
 
     public void trans(int x, int y) {
-        screen.trans(x, y);
+        if (screen != null) screen.trans(x, y);
     }
 
     public void addEntity(Entity e) {

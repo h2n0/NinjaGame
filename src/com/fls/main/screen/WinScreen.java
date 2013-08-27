@@ -11,7 +11,7 @@ import fls.engine.main.input.Input;
 public class WinScreen extends Screen {
 
     public WinScreen() {
-        Art.setTextCol(0xFFFFFF);
+        Art.setTextCol(Color.white);
         Stats.reset();
     }
 
