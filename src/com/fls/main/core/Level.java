@@ -10,6 +10,7 @@ import com.fls.main.art.Sprites;
 import com.fls.main.core.achive.Achievment;
 import com.fls.main.entitys.Entity;
 import com.fls.main.entitys.Explosion;
+import com.fls.main.entitys.LightSource;
 import com.fls.main.entitys.PickUp;
 import com.fls.main.entitys.Sign;
 import com.fls.main.screen.GameScreen;
@@ -18,6 +19,7 @@ import com.fls.main.screen.TestLevelScreen;
 public class Level {
 
     public byte[] tiles;
+    public int[] light;
     public int width, height;
     public List<Entity> entitys = new ArrayList<Entity>();
     public List<Entity>[] entityMap;
@@ -28,6 +30,7 @@ public class Level {
     public Random random = new Random();
     private GameScreen screen;
     private TestLevelScreen s2;
+    private boolean init = true;
 
     @SuppressWarnings("unchecked")
     public Level(TestLevelScreen s, BufferedImage i) {
@@ -39,6 +42,7 @@ public class Level {
         i.getRGB(0, 0, width, height, pixels, 0, width);
 
         tiles = new byte[width * height];
+        light = new int[width * height];
         entityMap = new ArrayList[width * height];
 
         for (int x = 0; x < width; x++) {
@@ -72,6 +76,10 @@ public class Level {
                     ww = 8;
                 } else if (col == 0xFFAA00) {
                     ww = 9;
+                } else if (col == 0x854C30) {
+                    // lights.add(new Light(x * 20, y * 20));
+                    addEntity(new LightSource(x * 20, y * 20));
+                    addLighting(x, y, 10);
                 }
                 tiles[x + y * width] = ww;
             }
@@ -88,6 +96,7 @@ public class Level {
         Sprites.level.getRGB(xOff * 25, yOff * 18, 25, 18, pixels, 0, 25);
 
         tiles = new byte[w * h];
+        light = new int[width * height];
         entityMap = new ArrayList[w * h];
 
         for (int x = 0; x < w; x++) {
@@ -121,6 +130,10 @@ public class Level {
                     ww = 8;
                 } else if (col == 0xFFAA00) {
                     ww = 9;
+                    addLighting(x, y, 12);
+                } else if (col == 0x854C30) {
+                    addEntity(new LightSource(x * 20, y * 20));
+                    addLighting(x, y, 10);
                 }
                 tiles[x + y * w] = ww;
             }
@@ -155,6 +168,26 @@ public class Level {
                 }
             }
         }
+    }
+
+    private void addLighting(int x, int y, int light) {
+        if (!validPos(x, y) || light < 0) return;
+        int newLight = light - 1;
+        if (light <= getLightLevel(x, y)) return;
+        this.light[x + y * 25] = light;
+        addLighting(x - 1, y, newLight);
+        addLighting(x, y - 1, newLight);
+        addLighting(x + 1, y, newLight);
+        addLighting(x, y + 1, newLight);
+    }
+
+    private boolean validPos(int x, int y) {
+        if (x < 0 || y < 0 || x >= 25 || y >= 18) return false;
+        return true;
+    }
+
+    public int getLightLevel(int x, int y) {
+        return light[x + y * 25];
     }
 
     public void render(Graphics g) {
@@ -198,12 +231,21 @@ public class Level {
                     xImg = 3;
                     break;
                 }
-                g.drawImage(Sprites.walls[xImg][yImg], x * 20, y * 20, null);
+                if (getLightLevel(x, y) != 0) g.drawImage(Sprites.walls[xImg][yImg], x * 20, y * 20, null);
             }
         }
         for (int i = 0; i < entitys.size(); i++) {
             Entity e = entitys.get(i);
             e.render(g);
+        }
+        if (init) {
+            for (int x = 0; x < 25; x++) {
+                for (int y = 0; y < 18; y++) {
+                    int l = light[x + y * 25];
+                    g.drawImage(Sprites.light[l / 2][0], x * 20, y * 20, null);
+                }
+            }
+            // init = false;
         }
     }
 

@@ -38,7 +38,6 @@ public class Achievment extends Entity {
         if (waiting) {
             lookForSpace();
         } else {
-            System.out.println(time);
             if (unlocked && !waiting && time < 101) {
                 yo += 1;
                 time++;

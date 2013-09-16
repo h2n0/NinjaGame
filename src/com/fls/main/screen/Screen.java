@@ -12,15 +12,17 @@ import fls.engine.main.input.Input;
 public abstract class Screen {
 
     protected Ninja ninja;
+    protected Input input;
 
     protected List<Entity> entitys = new ArrayList<Entity>();
 
     public abstract void render(Graphics g);
 
-    public abstract void tick(Input input);
+    public abstract void tick();
 
-    public void init(Ninja n) {
+    public void init(Ninja n,Input input) {
         this.ninja = n;
+        this.input = input;
     }
 
     public void setScreen(Screen screen) {

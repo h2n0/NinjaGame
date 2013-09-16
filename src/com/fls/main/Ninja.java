@@ -4,9 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import javax.swing.JFrame;
-import javax.swing.UIManager;
 
-import com.fls.main.art.Sprites;
 import com.fls.main.screen.Screen;
 import com.fls.main.screen.TitleScreen;
 
@@ -21,29 +19,24 @@ public class Ninja extends Init {
     public Screen screen;
     public JFrame frame;
 
+    private int tFrames;
+    private int tUpdates;
+
     public Ninja() {
-        Sprites.reload("");
         Art.setTextCol(Color.white);
-        laf();
         showFPS();
         setScale(1);
         createWindow("Ninja Game", 500, 360);
-        input = new Input(this, 2);
-        setScreen(new TitleScreen());
+        input = new Input(this, Input.BOTH);
         setCreators("Elliot Lee-Cerrino");
-
-    }
-
-    private void laf() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        setScreen(new TitleScreen());
+        skipInit();
     }
 
     public void tick() {
-        screen.tick(input);
+        screen.tick();
+        tFrames += getFPS();
+        tUpdates++;
     }
 
     public void render(Graphics g) {
@@ -51,8 +44,12 @@ public class Ninja extends Init {
     }
 
     public void setScreen(Screen screen) {
-        if (screen != null) screen.init(this);
+        if (screen != null) screen.init(this, input);
         this.screen = screen;
+    }
+
+    public void afterClose() {
+        System.out.println("Average ammount of frames: " + (tFrames / tUpdates));
     }
 
     public static void main(String[] args) {

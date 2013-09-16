@@ -2,6 +2,7 @@ package com.fls.main.screen;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 
 import com.fls.main.core.Level;
 import com.fls.main.core.Stats;
@@ -9,7 +10,6 @@ import com.fls.main.core.achive.Achievment;
 import com.fls.main.entitys.Player;
 
 import fls.engine.main.art.Art;
-import fls.engine.main.input.Input;
 
 public class GameScreen extends Screen {
 
@@ -19,6 +19,8 @@ public class GameScreen extends Screen {
     private int respawnTime = 0;
     public Level level = new Level(this, 25, 18, xLevel, yLevel, 0, 0);
     public int screenChangedelay = 10;
+    private int photoDelay = 0;
+    private int debugkey = KeyEvent.VK_BACK_SLASH;
 
     private boolean mayRespawn = false;
 
@@ -31,13 +33,21 @@ public class GameScreen extends Screen {
         level.unlockAchive(Achievment.play);
     }
 
-    public void tick(Input input) {
+    public void tick() {
+        if (photoDelay > 0) photoDelay--;
+        boolean up = input.keys[KeyEvent.VK_UP] || input.keys[KeyEvent.VK_W];
+        boolean down = input.keys[KeyEvent.VK_DOWN] || input.keys[KeyEvent.VK_S];
+        boolean left = input.keys[KeyEvent.VK_LEFT] || input.keys[KeyEvent.VK_A];
+        boolean right = input.keys[KeyEvent.VK_RIGHT] || input.keys[KeyEvent.VK_D];
+        boolean jump = input.keys[KeyEvent.VK_COMMA] || input.keys[KeyEvent.VK_Z];
+        boolean attack = input.keys[KeyEvent.VK_PERIOD] || input.keys[KeyEvent.VK_X];
+        boolean photo = input.keys[KeyEvent.VK_0];
         Stats.instance.time++;
         if (screenChangedelay > 0) screenChangedelay--;
-        if (input.esc.isPressed()) setScreen(new DebugScreen(this));
+        if (input.keys[debugkey]) setScreen(new DebugScreen(this, debugkey));
         level.tick();
         if (!player.removed) {
-            player.tick(input.up.isPressed(), input.down.isPressed(), input.left.isPressed(), input.right.isPressed(), input.space.isPressed(), input.shift.isPressed());
+            player.tick(up, down, left, right, jump, attack);
         } else {
             respawnTime++;
             if (respawnTime >= 20) {
@@ -45,12 +55,16 @@ public class GameScreen extends Screen {
             }
         }
 
-        if (mayRespawn && input.enter.isPressed()) {
+        if (mayRespawn && input.keys[KeyEvent.VK_ENTER]) {
             respawnRoom();
             mayRespawn = false;
             Art.setTextCol(Color.white);
         }
 
+        if (photo & photoDelay == 0) {
+            photoDelay = 60;
+            Art.saveScreenShot(ninja);
+        }
     }
 
     public void render(Graphics g) {

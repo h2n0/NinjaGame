@@ -2,11 +2,11 @@ package com.fls.main.screen;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 
 import com.fls.main.core.Stats;
 
 import fls.engine.main.art.Art;
-import fls.engine.main.input.Input;
 
 public class WinScreen extends Screen {
 
@@ -22,9 +22,9 @@ public class WinScreen extends Screen {
         Art.drawScaledText("Time Spent here: " + Stats.instance.getTimeString(), g, 100, 200, 2);
     }
 
-    public void tick(Input input) {
+    public void tick() {
         Stats.instance.time++;
-        if (input.enter.isPressed()) setScreen(new TitleScreen());
+        if (input.keys[KeyEvent.VK_ENTER])setScreen(new TitleScreen());
     }
 
 }

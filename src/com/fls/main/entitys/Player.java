@@ -62,6 +62,10 @@ public class Player extends Entity {
                 xImg = 0;
             }
         }
+        
+        if(climbing && againstWall){
+            
+        }
 
         g.drawImage(sheet[xImg + (frames / 10 % 4)][yImg], (int) x, (int) y, null);
     }
@@ -117,10 +121,10 @@ public class Player extends Entity {
             shootDelay = 20;
         }
 
-        if (jump && jumpDelay == 0) {
+        if (jump && jumpDelay == 0 && jumpCount <= 4) {
             level.unlockAchive(Achievment.jump);
             Stats.instance.jumps++;
-            if (jumpCount < 2 || againstWall) Audio.jump.play();
+            if (jumpCount < 2 || (jumpCount <= 4 && againstWall)) Audio.jump.play();
             jumping = true;
             jumpDelay = 20;
             if (onGround) {
@@ -131,10 +135,12 @@ public class Player extends Entity {
                 yy -= 2.5;
             }
             if (againstWall && jumpCount >= 1 && jumpCount <= 4) {
+                jumpDelay = 20;
+                if (dir == 1) xx -= (Math.abs(xx) + 5);
+                else if (dir == -1) xx += (Math.abs(xx) + 5);
+                yy -= 2;
                 jumpCount++;
-                if (dir == 1) xx -= (Math.abs(xx) + 10);
-                else if (dir == -1) xx += (Math.abs(xx) + 10);
-                yy -= 2.5 + (jumpCount / 2);
+
             }
         }
 
@@ -167,7 +173,9 @@ public class Player extends Entity {
         if (jumpDelay > 0) jumpDelay--;
         if (shootDelay > 0) shootDelay--;
 
-        if (againstWall) walking = false;
+        if (againstWall) {
+            walking = false;
+        }
 
         if (y < 5) level.trans(0, -1);
         if (y > 360 - w + 10 - 5) level.trans(0, 1);

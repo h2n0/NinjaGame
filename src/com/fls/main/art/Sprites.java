@@ -14,6 +14,7 @@ public class Sprites extends Art {
     public static BufferedImage[][] parts = split(load("/tex/particals.png"), 6, 6);
     public static BufferedImage[][] achive = split(load("/tex/achivments.png"), 12, 12);
     public static BufferedImage[][] levelt = split(load("/tex/LevelEditorSprites.png"), 20, 20);
+    public static BufferedImage[][] light = split(scale(load("/tex/LightScale.png"), 20), 20, 20);
     public static BufferedImage level = load("/Level.png");
     public static BufferedImage bgMenu = load("/menu/BG.png");
     public static BufferedImage texLogo;

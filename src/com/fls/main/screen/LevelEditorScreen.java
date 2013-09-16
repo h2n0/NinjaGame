@@ -2,6 +2,7 @@ package com.fls.main.screen;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -9,8 +10,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import com.fls.main.art.Sprites;
-
-import fls.engine.main.input.Input;
 
 public class LevelEditorScreen extends Screen {
 
@@ -22,9 +21,11 @@ public class LevelEditorScreen extends Screen {
 
     private boolean containsSpawn = false;
     private BufferedImage level;
+    private Screen parent;
 
-    public LevelEditorScreen() {
-        setBounds();
+    public LevelEditorScreen(Screen parent) {
+        decorteEdges();
+        this.parent = parent;
     }
 
     public void render(Graphics g) {
@@ -42,12 +43,12 @@ public class LevelEditorScreen extends Screen {
         }
     }
 
-    public void tick(Input input) {
+    public void tick() {
         if (changeDelay > 0) changeDelay--;
         tileX = input.mouse.getX() / 20;
         tileY = input.mouse.getY() / 20;
         if (mouseDelay > 0) mouseDelay--;
-        if (input.esc.isPressed() && changeDelay == 0) setScreen(new TitleScreen());
+        if (input.keys[KeyEvent.VK_ESCAPE] && changeDelay == 0) setScreen(parent);
         if (input.leftMouseButton.isClicked() && mouseDelay == 0) {
             changeTile(tileX, tileY);
         }
@@ -55,11 +56,11 @@ public class LevelEditorScreen extends Screen {
             setSpawn(tileX, tileY);
         }
 
-        if (input.shift.isPressed()) {
+        if (input.keys[KeyEvent.VK_SHIFT] && mouseDelay == 0) {
             saveLevel();
         }
 
-        if (input.enter.isPressed() && containsSpawn) {
+        if (input.keys[KeyEvent.VK_ENTER] && containsSpawn) {
             generateLevel();
             if (level == null) {
                 System.err.println("Level not found");
@@ -68,12 +69,12 @@ public class LevelEditorScreen extends Screen {
             changeDelay = 10;
             setScreen(new TestLevelScreen(this, level));
         }
-        if (input.space.isPressed()) clear();
+        if (input.keys[KeyEvent.VK_SPACE]) decorteEdges();
     }
 
     private void changeTile(int tileX, int tileY) {
         mouseDelay = 10;
-        if (tiles[tileX + tileY * 25] > 9) {
+        if (tiles[tileX + tileY * 25] > 10) {
             tiles[tileX + tileY * 25] = 0;
             return;
         }
@@ -81,26 +82,27 @@ public class LevelEditorScreen extends Screen {
     }
 
     public void setSpawn(int x, int y) {
-        if (xSpawn == -1 && ySpawn == -1) tiles[x + y * 25] = 11;
+        if (xSpawn != -1 && ySpawn != 1) {
+            int oldX = xSpawn;
+            int oldY = ySpawn;
+            if (oldX != x || oldY != y) {
+                tiles[xSpawn + ySpawn * 25] = 0;
+                tiles[x + y * 25] = 12;
+            } else return;
+        } else {
+            tiles[x + y * 25] = 12;
+        }
         this.xSpawn = x;
         this.ySpawn = y;
         this.containsSpawn = true;
     }
 
-    private void setBounds() {
+    private void decorteEdges() {
         for (int x = 0; x < 25; x++) {
             for (int y = 0; y < 18; y++) {
                 if (x == 0 || y == 0 || x == 24 || y == 17) {
                     tiles[x + y * 25] = 1;
-                }
-            }
-        }
-    }
-
-    private void clear() {
-        for (int x = 0; x < 25; x++) {
-            for (int y = 0; y < 18; y++) {
-                tiles[x + y * 25] = 0;
+                }else tiles[x + y * 25] = 0;
             }
         }
     }
@@ -125,11 +127,15 @@ public class LevelEditorScreen extends Screen {
                 else if (tiles[i] == 8) pixels[i] = 0xFF00FF; // --> Convayor
                 else if (tiles[i] == 9) pixels[i] = 0x9E009E; // <-- Convayor
                 else if (tiles[i] == 10) pixels[i] = 0xBB00BB; // ^ Convayor
-                else if (tiles[i] == 11) {
+                else if (tiles[i] == 11) pixels[i] = 0x854C30;
+                else if (tiles[i] == 12) {
                     pixels[i] = 0xFFFF00;
                     containsSpawn = true;
                 } else {
+                    containsSpawn = false;
                     pixels[i] = 0x000000;
+                    System.err.println("No valid spawn was found!");
+                    return;
                 }
             }
         }
@@ -140,6 +146,7 @@ public class LevelEditorScreen extends Screen {
 
     private void saveLevel() {
         if (level == null) return;
+        mouseDelay = 10;
         int amt = 1;
         try {
             File dir = new File("Levels");
@@ -149,6 +156,7 @@ public class LevelEditorScreen extends Screen {
                 out = new File(dir.getPath() + "/CustomLevel_" + amt + ".png");
                 amt++;
             }
+            out.setReadOnly();
             ImageIO.write(level, "png", out);
         } catch (IOException e) {
             e.printStackTrace();

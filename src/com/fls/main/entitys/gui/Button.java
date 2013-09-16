@@ -1,6 +1,5 @@
 package com.fls.main.entitys.gui;
 
-import java.awt.Color;
 import java.awt.Graphics;
 
 import com.fls.main.art.Sprites;
@@ -10,7 +9,7 @@ import fls.engine.main.input.Input;
 
 public class Button extends Entity {
 
-    private String title;
+    protected String title;
     public boolean mouseOver = false;
     public int id = -1;
     private int tx;
@@ -33,9 +32,9 @@ public class Button extends Entity {
     public void render(Graphics g) {
         int fx = (int) x;
         int fy = (int) y;
-      //  g.setColor(Color.red);
-        Sprites.drawButton(g, title, fx, fy, w, fx+tx, mouseOver);
-      //  g.drawRect(fx, fy, ((w + 1) * 24), 24);
+        // g.setColor(Color.red);
+        Sprites.drawButton(g, title, fx, fy, w, fx + tx, mouseOver);
+        // g.drawRect(fx, fy, ((w + 1) * 24), 24);
         // g.setColor(Color.blue);
         // g.drawRect(getEX(), fy, ((w + 1) * 24), 24);
     }

@@ -2,12 +2,12 @@ package com.fls.main.screen;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 
 import com.fls.main.art.Sprites;
 import com.fls.main.core.Stats;
 
 import fls.engine.main.art.Art;
-import fls.engine.main.input.Input;
 
 public class MessageScreen extends Screen {
 
@@ -104,9 +104,9 @@ public class MessageScreen extends Screen {
         }
     }
 
-    public void tick(Input input) {
+    public void tick() {
         if (delay > 0) delay--;
-        if (input.enter.isPressed() && delay == 0) {
+        if (input.keys[KeyEvent.VK_ENTER] && delay == 0) {
             setScreen(parent);
         }
     }
